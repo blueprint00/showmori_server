@@ -1,15 +1,23 @@
 package com.example.showmori2.Dto;
 
+import com.example.showmori2.domain.User_info;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Getter
 @Setter
 public class LoginResponseDTO {
     private String user_id;
-    private String check;
+    private Boolean success;
 
-//    public LoginResponseDTO(User_info user_info) {
-//        check =
+//    public LoginResponseDTO(String user_id, String success) {
+//        this.user_id = user_id;
+//        this.success = success;
 //    }
+
+    public LoginResponseDTO(User_info entity) {
+        this.user_id = entity.getUser_id().toString();
+    }
 }

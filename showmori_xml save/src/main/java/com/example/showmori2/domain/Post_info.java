@@ -19,7 +19,7 @@ public class Post_info {
     private String poster;
     @Column(nullable = false, length = 45)
     private String title;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     private Date contents;
     @Column(nullable = false)
     private int goal_sum;

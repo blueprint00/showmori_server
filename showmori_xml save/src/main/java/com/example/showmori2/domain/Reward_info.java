@@ -14,7 +14,7 @@ public class Reward_info {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long reward_id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 45)
     private String donation_reward;
 
 //    @ManyToOne

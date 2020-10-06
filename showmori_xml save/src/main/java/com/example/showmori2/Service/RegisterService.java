@@ -7,18 +7,24 @@ import com.example.showmori2.Dto.RegisterResponseDTO;
 import com.example.showmori2.domain.User_info_repository;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
+@Transactional
 public class RegisterService {
+    @Autowired
     private User_info_repository user_info_repository;
 
-    @Transactional
+//    @Transactional
     public void saveUserinfo(String user_id, String password, String user_name, String user_phone){
         RegisterDTO registerDTO = RegisterDTO.builder()
                 .user_id(user_id)
@@ -28,19 +34,13 @@ public class RegisterService {
                 .build();
 
         user_info_repository.save(registerDTO.toEntity());
+//        user_info_repository.saveRegisterInfo(user_id, password, user_name, user_phone);
         System.out.println("service");
     }
-//
-//    public List<LoginResponseDTO> findByUserId(String user_id){
-//        return user_info_repository.getList(user_id)
-//                .map(LoginResponseDTO::new)
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Transactional
-//    public List<LoginResponseDTO> findPasswordById(String user_id){
-//        return user_info_repository.findPassword(user_id)
-//                .map(LoginResponseDTO::new)
-//                .collect(Collectors.toList());
-//    }
+
+    @Transactional
+    public Long checkRegisterId(String user_id){
+        return user_info_repository.checkRegisterId(user_id);
+    }
+
 }

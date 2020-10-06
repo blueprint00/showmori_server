@@ -1,0 +1,86 @@
+
+#spring:
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/showmori?serverTimezone=UTC
+#    username: root
+#    password: showmori
+#    driver-class-name: com.mysql.jdbc.Driver
+#  devtools:
+#    livereload:
+#      enabled: true
+#  freemarker:
+#    cache: false
+#  mustache:
+#    expose-session-attributes: true
+
+#spring.datasource.initialization-mode=always
+#spring.datasource.schema=classpath:org/springframework/session/jdbc/schema-postgresql.sqlserver.port= 8000
+#spring.jpa.generate-ddl=true
+
+spring:
+#  h2:
+#    console:
+#      enabled: true
+#  jpa:
+#    database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:mysql://localhost/showmori?characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: dkdusaos-1
+    driver-class-name: com.mysql.jdbc.Driver
+    generate-unique-name: true
+    #initialization-mode: embedded
+#    schema: showmori
+    hikari:
+      schema: showmori
+  devtools:
+    livereload:
+      enabled: true
+  freemarker:
+    cache: false
+  mustache:
+    expose-session-attributes: true
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+      naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    database: mysql
+
+
+#spring
+#  h2:
+#    console:
+#      enabled: true
+#      path: /console
+#  jpa:
+#     database : MYSQL
+
+#    hibernate:
+#      ddl-auto : update
+#  datasource:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:~/test
+#    username: sa
+#    password:
+
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: "jdbc:mysql://localhost:3306/showmori?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Seoul"
+#    username: root
+#    password: good
+#    hikari:
+#      auto-commit: false
+#      connection-test-query: SELECT 1
+#      minimum-idle: 10
+#      maximum-pool-size: 50
+#      transaction-isolation: TRANSACTION_READ_UNCOMMITTED
+#      pool-name: showmori
+#  jpa:
+#    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+#    properties:
+#      hibernate:
+#        format_sql: true
+#    generate-ddl: false
+#    open-in-view: false

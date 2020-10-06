@@ -3,30 +3,35 @@ package com.example.showmori2.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.UUID;
 
 @NoArgsConstructor // 기본 생성자
 @Entity
 @Getter
+@Setter
 @Table(name="user")
 public class User_info {
-    @Id
+    @Id //@GeneratedValue(generator="system-uuid")
+    //x@GenericGenerator(name="system-uuid", strategy = "uuid")
+//    @Type(type="uuid-char")
+    @Column(name = "user_id", nullable = false)
     private String user_id;
 
-    @Column(nullable = false, length = 45)
+    @Column(name = "password", nullable = false, length = 45)
     private String password;
-    @Column(nullable = false, length = 10)
+    @Column(name = "user_name", nullable = false, length = 45)
     private String user_name;
-    @Column(nullable = false, length = 10)
+    @Column(name = "user_phone", nullable = false, length = 45)
     private String user_phone;
 
     @Builder
     public User_info(String user_id, String password, String user_name, String user_phone) {
-        this.user_id = user_id;
+        this.user_id = user_id;//UUID.nameUUIDFromBytes(user_id.getBytes())//UUID.fromString(user_id);
         this.password = password;
         this.user_name = user_name;
         this.user_phone = user_phone;
@@ -34,7 +39,7 @@ public class User_info {
 
    @Builder
     public User_info(String user_id, String password) {
-        this.user_id = user_id;
+        this.user_id = user_id;//UUID.fromString(user_id);
         this.password = password;
     }
 }
