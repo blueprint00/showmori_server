@@ -1,4 +1,4 @@
-package com.example.showmori2.Dto;
+package com.example.showmori2.tmp;
 
 import com.example.showmori2.domain.User_info;
 

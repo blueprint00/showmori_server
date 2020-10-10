@@ -1,4 +1,4 @@
-package com.example.showmori2.Dto;
+package com.example.showmori2.tmp;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

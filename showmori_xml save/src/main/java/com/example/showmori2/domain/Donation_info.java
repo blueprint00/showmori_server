@@ -20,15 +20,15 @@ public class Donation_info {
     @Column(nullable = false)
     private int donation_money;
     @Column(nullable = false)
-    private Date donaiton_date;
+    private Date selected_date;
 
-//    @ManyToOne
-//    @JoinColumn(name = "post_id")
-//    private long post_id;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private String user_id;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post_info post_info;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User_info user_info;
 
 
 }
