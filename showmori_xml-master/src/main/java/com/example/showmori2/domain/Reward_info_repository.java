@@ -18,7 +18,7 @@ public interface Reward_info_repository extends JpaRepository<Reward_info, Long>
 
     //상세 페이지에서 리워드 리스트 띄우기
     @Query(value = "SELECT * FROM reward WHERE post_id = ?1", nativeQuery = true)
-    Stream<Reward_info> getRewardinfoByPostId(@Param("post_id")Long post_id);
+    Stream<Reward_info> getRewardinfoByPostID(@Param("post_id")Long post_id);
 
 
     //수정 시 리워드 수정

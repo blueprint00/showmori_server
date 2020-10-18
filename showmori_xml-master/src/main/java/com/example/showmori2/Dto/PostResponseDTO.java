@@ -23,11 +23,12 @@ public class PostResponseDTO {
     private Date dead_line;
     private int total_donation;
     private List<RewardResponseDTO> reward_list;
+    private List<DonationResponseDTO> donation_list;
 
     private User_info user_info;
 
 
-    public PostResponseDTO(long post_id, String poster, String image, String title, String contents, int goal_sum, Date dead_line, int total_donation, List<RewardResponseDTO> rewardList){//}, User_info user_info) {//
+    public PostResponseDTO(long post_id, String poster, String image, String title, String contents, int goal_sum, Date dead_line, int total_donation, List<RewardResponseDTO> reward_list, List<DonationResponseDTO> donation_list){//}, User_info user_info) {//
         this.post_id = post_id;
         this.poster = poster;
         this.image = image;
@@ -36,7 +37,8 @@ public class PostResponseDTO {
         this.goal_sum = goal_sum;
         this.dead_line = dead_line;
         this.total_donation = total_donation;
-        this.reward_list = rewardList;
+        this.reward_list = reward_list;
+        this.donation_list = donation_list;
 //        this.user_info = user_info;
     }
 
@@ -49,6 +51,8 @@ public class PostResponseDTO {
         dead_line = entity.getDead_line();
         total_donation = entity.getTotal_donation();
 //        reward_list = entity.getRewardList();
+//        donation_list = entity.getDonationList();
+
         user_info = entity.getUser_info();
     }
 }

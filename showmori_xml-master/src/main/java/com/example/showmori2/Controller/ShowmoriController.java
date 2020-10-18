@@ -15,7 +15,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.List;
 
 //@Controller
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -41,16 +41,11 @@ public class ShowmoriController {
     private static final Integer DAY_IN_SECONDS = 24 * 60 * 60;
 
     private User_info_repository user_info_repository;
-    private Post_info_repository post_info_repository;
-
-//    private RegisterService registerService;
-//    private LoginService loginService;
 
     @Autowired
     private UserService userService;
     @Autowired
     private PostService postService;
-
 //    private HttpSession session, userInfoSession;
 
     public void confirmCORS(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
@@ -160,13 +155,11 @@ public class ShowmoriController {
 
         confirmCORS(requestMethods, requestHeaders, request, response);
 
-//        Gson gson = new Gson();
         UserDTO client_request = null;
         UserResponseDTO server_response = new UserResponseDTO();
 
         String jsonString = inputFromJson(request);
 
-//        client_request = gson.fromJson(jsonObject.toString(), LoginDTO.class);
         client_request = new Gson().fromJson(jsonString, UserDTO.class);
 
         String user_id = client_request.getUser_id();
@@ -189,13 +182,12 @@ public class ShowmoriController {
             server_response.setSuccess(false);
         }
 
-        System.out.println();
         return server_response;
     }
 
     @CrossOrigin(origins = "*") // 회원가입
     @RequestMapping(value = "/api/users/register", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
-    public UserResponseDTO doRegister(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
+    public CheckDTO doRegister(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                       @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
@@ -203,7 +195,7 @@ public class ShowmoriController {
         confirmCORS(requestMethods, requestHeaders, request, response);
 
         UserDTO client_request = null;
-        UserResponseDTO server_response = new UserResponseDTO();
+        CheckDTO server_response = new CheckDTO();
 
         String jsonString = inputFromJson(request);
         client_request = new Gson().fromJson(jsonString, UserDTO.class);
@@ -218,21 +210,19 @@ public class ShowmoriController {
         User_info user_info = user_info_repository.getOne(user_id);
         //????????????????????????????????????????????
 
-//        System.out.println("register user_info : " + user_info.getUser_id() + " " + user_info.getPassword());
-        if (userService.checkRegisterId(user_id) == 0) { // id 중복 확인
+        if (userService.checkRegisterId(user_id)) { // id 중복 확인
 //                session = request.getSession(true);
 //                session.setAttribute("user_info", user_info);
 
             userService.saveUserinfo(user_id, password, user_name, user_phone); // db 저장
 
-            server_response.setValidate(true);
             server_response.setSuccess(true);
+            server_response.setValidate(true);
         } else {
             server_response.setValidate(false);
             server_response.setSuccess(false);
         }
 
-        System.out.println(server_response.getSuccess());
         return server_response;
     }
 
@@ -246,8 +236,8 @@ public class ShowmoriController {
 
         confirmCORS(requestMethods, requestHeaders, request, response);
 
-        UserResponseDTO server_response = new UserResponseDTO();
         User_info user_info = userService.findUserInfoById(user_id);
+        UserResponseDTO server_response = new UserResponseDTO();
 
         server_response.setUser_id(user_id);
         server_response.setUser_name(user_info.getUser_name());
@@ -397,22 +387,20 @@ public class ShowmoriController {
 
     @CrossOrigin(origins = "*") // 전체 게시글
     @RequestMapping(value = "/api/funding", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
-    public ResponseDTO getPostInfoList(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
-                                       @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
-                                       HttpServletRequest request,
-                                       HttpServletResponse response) {
+    public List<PostResponseDTO> getPostInfoList(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
+                                     @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) {
 
         confirmCORS(requestMethods, requestHeaders, request, response);
 
-        ResponseDTO server_response = new ResponseDTO();
-
-        server_response.setPost(postService.getPostInfoList());
+        List<PostResponseDTO> server_response = postService.getPostInfoList();
         return server_response;
     }
 
     @CrossOrigin(origins = "*") // 검색
     @RequestMapping(value = "/api/funding/{title}/result", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
-    public ResponseDTO searchPostInfo(@PathVariable("title") String title,
+    public List<PostResponseDTO> searchPostInfo(@PathVariable("title") String title,
                                     @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                     @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                     HttpServletRequest request,
@@ -420,9 +408,7 @@ public class ShowmoriController {
 
         confirmCORS(requestMethods, requestHeaders, request, response);
 
-        ResponseDTO server_response = new ResponseDTO();
-
-        server_response.setPost(postService.findPostInfoByTitle(title));
+        List<PostResponseDTO> server_response = postService.searchPost(title);
         return server_response;
     }
 
@@ -449,7 +435,7 @@ public class ShowmoriController {
 
     @CrossOrigin(origins = "*") // 공연 상세페이지
     @RequestMapping(value = "/api/funding/{post_id}", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
-    public PostResponseDTO getPostInfo(@PathVariable("post_id") Long post_id,
+    public PostResponseDTO getPostDetailInfo(@PathVariable("post_id") Long post_id,
                                  @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                  @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                  HttpServletRequest request,
@@ -460,34 +446,26 @@ public class ShowmoriController {
         String jsonString = inputFromJson(request);
         PostDTO client_request = new Gson().fromJson(jsonString, PostDTO.class);
 
-        PostResponseDTO server_response = postService.getPostInfoById(post_id, client_request.getUser_info().getUser_id());//, client_request.getTitle());
-        if(server_response == null) return server_response;
-
+        PostResponseDTO server_response = postService.getPostDetailInfo(post_id, client_request.getUser_info().getUser_id());//, client_request.getTitle());
         return server_response;
     }
 
-    @CrossOrigin(origins = "*") // 공연 수정 전 공연 정보 뿌려주기
-    @RequestMapping(value = "/api/funding/beforeModification", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
-    public PostResponseDTO getPostInfo(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
-                                 @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
-                                 HttpServletRequest request,
-                                 HttpServletResponse response) {
-
-        confirmCORS(requestMethods, requestHeaders, request, response);
-
-        String jsonString = inputFromJson(request);
-        PostDTO client_request = new Gson().fromJson(jsonString, PostDTO.class);
-
-        //????????????????????????????????????????????
-        PostResponseDTO server_response = postService.getPostInfoById(client_request.getPost_id(), client_request.getUser_info().getUser_id());// client_request.getTitle());
-        //????????????????????????????????????????????
-
-
-
-        if(server_response == null) return server_response;
-
-        return server_response;
-    }
+//    @CrossOrigin(origins = "*") // 공연 수정 전 공연 정보 뿌려주기
+//    @RequestMapping(value = "/api/funding/beforeModification", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
+//    public PostResponseDTO getPostInfo(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
+//                                 @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
+//                                 HttpServletRequest request,
+//                                 HttpServletResponse response) {
+//
+//        confirmCORS(requestMethods, requestHeaders, request, response);
+//
+//        String jsonString = inputFromJson(request);
+//        PostDTO client_request = new Gson().fromJson(jsonString, PostDTO.class);
+//
+//        PostResponseDTO server_response = postService.getPostDetailInfo(client_request.getPost_id(), client_request.getUser_info().getUser_id());// client_request.getTitle());
+//
+//        return server_response;
+//    }
 
     @CrossOrigin(origins = "*") // 공연 수정 후
     @RequestMapping(value = "/api/funding/afterModification", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
@@ -495,8 +473,7 @@ public class ShowmoriController {
     public CheckDTO updatePostInfo(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                    @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                    HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   @RequestPart MultipartFile file) {
+                                   HttpServletResponse response) {
 
         confirmCORS(requestMethods, requestHeaders, request, response);
 
@@ -504,9 +481,7 @@ public class ShowmoriController {
         PostDTO client_request = new Gson().fromJson(jsonString, PostDTO.class);
 //        List<Reward_info> rewardDTO = client_request.getRewardList();
 
-        client_request.setPoster(file.getOriginalFilename());
         postService.updatePost(client_request);
-//        postService.updatePost(file);
 
         CheckDTO server_response = new CheckDTO(null, true, true);
 
@@ -514,20 +489,80 @@ public class ShowmoriController {
     }
 
     @CrossOrigin(origins = "*") // 게시글 삭제
-    @RequestMapping(value = "/api/funding/deletePost", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE})
-    public CheckDTO deletePost(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
-                           @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
-                           HttpServletRequest request,
-                           HttpServletResponse response) {
+    @RequestMapping(value = "/api/funding/{post_id}/delete", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE})
+    public CheckDTO deletePost(@PathVariable("post_id")Long post_id,
+                               @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
+                               @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
 
         confirmCORS(requestMethods, requestHeaders, request, response);
-        String jsonString = inputFromJson(request);
-        PostDTO client_request = new Gson().fromJson(jsonString, PostDTO.class);
 
-        postService.deletePost(client_request.getPost_id());
-        CheckDTO server_response = new CheckDTO(null, true, true);
+//        postService.deletePost(post_id);
+        CheckDTO server_response = postService.deletePost(post_id); //new CheckDTO(null, true, true);
 
         return server_response;
     }
 
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/api/donation/{post_id}", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE})
+    public CheckDTO getDonation(@PathVariable("post_id")Long post_id,
+                               @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
+                               @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+
+        confirmCORS(requestMethods, requestHeaders, request, response);
+//        String jsonString = inputFromJson(request);
+
+        return new CheckDTO();
+    }
 }
+
+
+
+
+//{
+//"post":[
+//        {
+//            "title":"string",
+//            "total_donation":"int",
+//            "goal_sum":"int",
+//            "deadline":"date",
+//            "user_info...?" : [
+//                {
+//                    "user_id":"string(후원한 사람들)",
+//                    "user_name" : "string",
+//                    "user_phone":"string(후원한 사람들)",
+//                    "donation" : [
+//                        {
+//                            "donation_money" : "int",
+//                            "selected_day" : "string"
+//                        },
+//                         ...
+//                    ]
+//                },
+//                 ...
+//            ]
+//        }
+//    ]
+//}
+
+
+//
+//{
+//    post : [{
+//        title : string
+//        total_donation : int
+//        goal_sum : int
+//        deadline : date
+//        donation : [{
+//            donation_money : int
+//            selected_date : Date(내가 고른 관람 날짜)
+//          },
+//          ...
+//        ]
+//      },
+//      ...
+//    ]
+//}

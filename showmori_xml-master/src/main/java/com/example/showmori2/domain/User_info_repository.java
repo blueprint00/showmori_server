@@ -19,8 +19,8 @@ public interface User_info_repository extends JpaRepository<User_info, String> {
     @Query(value = "SELECT password FROM user WHERE user_id = ?1", nativeQuery = true)
     String findPasswordById(@Param("user_id")String userid);
 
-    @Query(value = "SELECT COUNT(user_id) FROM user WHERE user_id = ?1", nativeQuery = true)
-    Long checkRegisterId(@Param("user_id")String userid);
+    @Query(value = "SELECT user_id FROM user WHERE user_id = ?1", nativeQuery = true)
+    Boolean checkRegisterId(@Param("user_id")String userid);
 
     @Modifying
     @Transactional

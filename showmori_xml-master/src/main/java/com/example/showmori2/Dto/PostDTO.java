@@ -1,5 +1,6 @@
 package com.example.showmori2.Dto;
 
+import com.example.showmori2.domain.Donation_info;
 import com.example.showmori2.domain.Post_info;
 import com.example.showmori2.domain.Reward_info;
 import com.example.showmori2.domain.User_info;
@@ -26,7 +27,8 @@ public class PostDTO {
     private String start_day;
     private String last_day;
     private List<Reward_info> reward_list;
-
+    private List<Donation_info> donation_list;
+    
     private User_info user_info;
 //    private UserDTO userDTO;
 //    private User_info user_info;

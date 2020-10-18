@@ -50,7 +50,7 @@ public interface Post_info_repository extends JpaRepository<Post_info, Long> {
 
     //상세 페이지 && 수정 전 전체 정보
     @Query(value = "SELECT * FROM post WHERE post_id = ?1", nativeQuery = true)
-    PostResponseDTO getPostInfoByPostId(@Param("post_id")Long post_id);
+    PostResponseDTO getPostInfoByPostID(@Param("post_id")Long post_id);
 
     //해당 게시물 등록 유저 확인
     @Query(value = "SELECT user_id FROM post WHERE post_id = ?1", nativeQuery = true)
@@ -75,11 +75,14 @@ public interface Post_info_repository extends JpaRepository<Post_info, Long> {
     //공연 삭제
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM post WHERE post_id= ?1", nativeQuery = true)
-    void deletePost(@Param("post_id")Long post_id);//@Param("title")String title);
+    @Query(value = "DELETE FROM post WHERE post_id = ?1", nativeQuery = true) // ON DELETE CASCADE
+    void deletePostByPostID(@Param("post_id")Long post_id);//@Param("title")String title);
 
     @Query(value = "SELECT post_id FROM post WHERE title = ?1", nativeQuery = true)
     Long getPostIdByTitle(@Param("title")String title);
+
+    @Query(value = "SELECT poster FROM post WHERE post_id = ?1", nativeQuery = true)
+    String getPosterByPostID(@Param("post_id")Long post_id);
 
 
 

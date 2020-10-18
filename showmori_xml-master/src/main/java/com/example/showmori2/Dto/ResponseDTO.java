@@ -12,30 +12,21 @@ public class ResponseDTO {
 
     //    private Donation_info donation_info;
     private List<PostResponseDTO> post;
-//    private List<RewardResponseDTO> rewardList;
-    private UserResponseDTO user;
+//    private UserResponseDTO user;
 
     public List<PostResponseDTO> getPost() {
         return post;
     }
 
-//    public List<RewardResponseDTO> getRewardList() {
-//        return rewardList;
+//    public UserResponseDTO getUserResponseDTO() {
+//        return user;
 //    }
-
-    public UserResponseDTO getUserResponseDTO() {
-        return user;
-    }
 
     public void setPost(List<PostResponseDTO> post) {
         this.post = post;
     }
 
-//    public void setRewardList(List<RewardResponseDTO> rewardList) {
-//        this.rewardList = rewardList;
+//    public void setUserResponseDTO(UserResponseDTO user) {
+//        this.user = user;
 //    }
-
-    public void setUserResponseDTO(UserResponseDTO user) {
-        this.user = user;
-    }
 }

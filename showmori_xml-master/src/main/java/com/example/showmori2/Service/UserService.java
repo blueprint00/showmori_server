@@ -1,6 +1,5 @@
 package com.example.showmori2.Service;
 
-import com.example.showmori2.Dto.UserDTO;
 import com.example.showmori2.domain.User_info;
 import com.example.showmori2.domain.User_info_repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class UserService {
     }
 
     @Transactional
-    public Long checkRegisterId(String user_id){
+    public Boolean checkRegisterId(String user_id){
         return user_info_repository.checkRegisterId(user_id);
     }
 
