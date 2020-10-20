@@ -64,7 +64,7 @@ public class PostService {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.decode(base[1]));
             BufferedImage bufferedImage1 = ImageIO.read(inputStream);
-            ImageIO.write(bufferedImage1, "jpg", new File(path + posterName + posterName.split(".")[1]));
+            ImageIO.write(bufferedImage1, "jpg", new File(path + posterName));
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -80,28 +80,29 @@ public class PostService {
         }
     }
 
-
-
     @Transactional // 메이 페이지 == 전체 공연
     public List<PostResponseDTO> getPostInfoList(){
         List<PostResponseDTO> postResponseDTOList = post_info_repository.getPostList()
                         .map(PostResponseDTO::new)
                         .collect(Collectors.toList());
 
-//        for(PostResponseDTO postResponseDTO : postResponseDTOList){
-//            String posterName = postResponseDTO.getPoster();
-//            postResponseDTO.setImage(returnImage(posterName));
-//        }
         for (int i = 0; i < postResponseDTOList.size(); i++) {
             postResponseDTOList.get(i).setImage(returnImage(postResponseDTOList.get(i).getPoster()));
-
-//            PostResponseDTO dto = new PostResponseDTO();
-//            dto = postResponseDTOList.get(i);
-//            dto.setImage(returnImage(postResponseDTOList.get(i).getPoster()));
-//            postResponseDTOList.set(i, dto);
         }
 
         return postResponseDTOList;
+    }
+
+    @Transactional
+    public List<PostResponseDTO> getPostId(){
+
+        System.out.println(post_info_repository.getPostList()
+                .map(PostResponseDTO::new)
+                .collect(Collectors.toList()).get(0).getPost_id());
+
+        return post_info_repository.getPostList()
+                .map(PostResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional // 검색
@@ -110,21 +111,25 @@ public class PostService {
                 .map(PostResponseDTO::new)
                 .collect(Collectors.toList());
 
-        for(PostResponseDTO postResponseDTO : postResponseDTOList){
-            String posterName = postResponseDTO.getPoster();
-            postResponseDTO.setImage(returnImage(posterName));
+        for (int i = 0; i < postResponseDTOList.size(); i++) {
+            postResponseDTOList.get(i).setImage(returnImage(postResponseDTOList.get(i).getPoster()));
         }
-
-//        for (int i = 0; i < postResponseDTOList.size(); i++) {
-//            postResponseDTOList.get(i).setImage(returnImage(postResponseDTOList.get(i).getPoster()));
-//        }
 
         return postResponseDTOList;
     }
 
     @Transactional // 공연 게시
     public CheckDTO insertPost(PostDTO postDTO) {
-       post_info_repository.insertPost(postDTO.getPoster(),
+        List<PostResponseDTO> postResponseDTOList= post_info_repository.getPostList()
+                .map(PostResponseDTO::new)
+                .collect(Collectors.toList());
+
+        for(PostResponseDTO dto : postResponseDTOList){
+            if(postDTO.getTitle().equals(dto.getTitle()))
+                return new CheckDTO(postDTO.getUser_info().getUser_id(), false, false);
+        }
+
+        post_info_repository.insertPost(postDTO.getPoster(),
                 postDTO.getTitle(), postDTO.getContents(),
                 postDTO.getTotal_donation(),
                 postDTO.getGoal_sum(),
@@ -143,10 +148,9 @@ public class PostService {
                 reward_info_repository.insertReward(post_id, reward_info.getReward_money(), reward_info.getReward());
             }
         } catch (Exception e){
-            return new CheckDTO(false);
+            return new CheckDTO(postDTO.getUser_info().getUser_id(), false, false);
         }
-
-        return new CheckDTO(true);
+        return new CheckDTO(postDTO.getUser_info().getUser_id(),true, true);
     }
 
     @Transactional // 게시물 수정 - > post_id로 무슨 포스트인지
@@ -183,7 +187,8 @@ public class PostService {
 //    public void updatePost(MultipartFile file){
 //        postDTO.setPoster(StringUtils.cleanPath(file.getOriginalFilename()));
 
-        post_info_repository.updatePost(postDTO.getPoster(), postDTO.getTitle(), postDTO.getContents(), postDTO.getTotal_donation(), postDTO.getGoal_sum(),
+        post_info_repository.updatePost(postDTO.getPost_id(),postDTO.getPoster(), postDTO.getTitle(), postDTO.getContents(),
+                                    postDTO.getTotal_donation(), postDTO.getGoal_sum(),
                                     Date.valueOf(postDTO.getDead_line()),
                                     Date.valueOf(postDTO.getStart_day()),
                                     Date.valueOf(postDTO.getLast_day()),

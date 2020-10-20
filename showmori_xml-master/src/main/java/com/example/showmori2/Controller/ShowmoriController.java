@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 //@Controller
@@ -186,7 +187,7 @@ public class ShowmoriController {
     }
 
     @CrossOrigin(origins = "*") // 회원가입
-    @RequestMapping(value = "/api/users/register", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/api/users/register", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
     public CheckDTO doRegister(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                       @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                       HttpServletRequest request,
@@ -385,8 +386,24 @@ public class ShowmoriController {
         return IOUtils.toByteArray(in);
     }
 
+    @CrossOrigin(origins = "*") // DB에 저장되어있는 post_id들 프론트로
+    @RequestMapping(value = "/api/funding/all-post-id", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
+    public List<Long> getPostId(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
+                                 @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response) {
+
+        confirmCORS(requestMethods, requestHeaders, request, response);
+        List<Long> server_response = new ArrayList<>();
+
+        for (PostResponseDTO postResponseDTO : postService.getPostId())
+            server_response.add(postResponseDTO.getPost_id());
+
+        return server_response;
+    }
+
     @CrossOrigin(origins = "*") // 전체 게시글
-    @RequestMapping(value = "/api/funding", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/api/funding/all", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
     public List<PostResponseDTO> getPostInfoList(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                      @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                      HttpServletRequest request,
@@ -399,7 +416,7 @@ public class ShowmoriController {
     }
 
     @CrossOrigin(origins = "*") // 검색
-    @RequestMapping(value = "/api/funding/{title}/result", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/api/discover/{title}", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
     public List<PostResponseDTO> searchPostInfo(@PathVariable("title") String title,
                                     @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                     @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
@@ -413,7 +430,7 @@ public class ShowmoriController {
     }
 
     @CrossOrigin(origins = "*") // 공연 게시
-    @RequestMapping(value = "/api/funding/posting", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/api/funding/create-funding", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
     public CheckDTO insertPostInfo(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                    @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                    HttpServletRequest request,
@@ -433,8 +450,8 @@ public class ShowmoriController {
         return server_response;
     }
 
-    @CrossOrigin(origins = "*") // 공연 상세페이지
-    @RequestMapping(value = "/api/funding/{post_id}", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
+    @CrossOrigin(origins = "*") // 공연 상세페이지 && 수정 전 전체 정보 뿌려주기
+    @RequestMapping(value = "/api/funding/{post_id}/detail", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
     public PostResponseDTO getPostDetailInfo(@PathVariable("post_id") Long post_id,
                                  @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                  @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
@@ -450,27 +467,11 @@ public class ShowmoriController {
         return server_response;
     }
 
-//    @CrossOrigin(origins = "*") // 공연 수정 전 공연 정보 뿌려주기
-//    @RequestMapping(value = "/api/funding/beforeModification", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST})
-//    public PostResponseDTO getPostInfo(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
-//                                 @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
-//                                 HttpServletRequest request,
-//                                 HttpServletResponse response) {
-//
-//        confirmCORS(requestMethods, requestHeaders, request, response);
-//
-//        String jsonString = inputFromJson(request);
-//        PostDTO client_request = new Gson().fromJson(jsonString, PostDTO.class);
-//
-//        PostResponseDTO server_response = postService.getPostDetailInfo(client_request.getPost_id(), client_request.getUser_info().getUser_id());// client_request.getTitle());
-//
-//        return server_response;
-//    }
-
     @CrossOrigin(origins = "*") // 공연 수정 후
-    @RequestMapping(value = "/api/funding/afterModification", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
+    @RequestMapping(value = "/api/funding/{post_id}/modify-funding", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT})
 //                                , consumes={"multipart/form-data"})
-    public CheckDTO updatePostInfo(@RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
+    public CheckDTO updatePostInfo(@PathVariable("post_id") Long post_id,
+                                   @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                    @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,
                                    HttpServletRequest request,
                                    HttpServletResponse response) {
@@ -480,7 +481,7 @@ public class ShowmoriController {
         String jsonString = inputFromJson(request);
         PostDTO client_request = new Gson().fromJson(jsonString, PostDTO.class);
 //        List<Reward_info> rewardDTO = client_request.getRewardList();
-
+        client_request.setPost_id(post_id);
         postService.updatePost(client_request);
 
         CheckDTO server_response = new CheckDTO(null, true, true);
@@ -489,7 +490,7 @@ public class ShowmoriController {
     }
 
     @CrossOrigin(origins = "*") // 게시글 삭제
-    @RequestMapping(value = "/api/funding/{post_id}/delete", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE})
+    @RequestMapping(value = "/api/funding/{post_id}/remove", method = {RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE})
     public CheckDTO deletePost(@PathVariable("post_id")Long post_id,
                                @RequestHeader(value = "Access-Control-Request-Method", required = false) String requestMethods,
                                @RequestHeader(value = "Access-Control-Request-Headers", required = false) String requestHeaders,

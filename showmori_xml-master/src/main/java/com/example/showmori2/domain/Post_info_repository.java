@@ -59,9 +59,10 @@ public interface Post_info_repository extends JpaRepository<Post_info, Long> {
     //공연 수정
     @Modifying
     @Transactional
-    @Query(value = "UPDATE post SET (poster = ?1, title = ?2, contents = ?3, total_donation = ?4, goal_sum = ?5," +
-            "dead_line = ?6, start_day = ?7, last_day = ?8, user_id = ?9)", nativeQuery = true)
-    void updatePost(@Param("poster")String poster,
+    @Query(value = "UPDATE post SET (poster = ?2, title = ?3, contents = ?4, total_donation = ?5, goal_sum = ?6," +
+            "dead_line = ?7, start_day = ?8, last_day = ?9, user_id = ?10) WHERE post_id = ?1", nativeQuery = true)
+    void updatePost(@Param("post_id")Long post_id,
+                    @Param("poster")String poster,
                     @Param("title")String title,
                     @Param("contents")String contents,
                     @Param("total_donation")int total_donation,
