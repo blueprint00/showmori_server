@@ -1,0 +1,37 @@
+spring:
+#  h2:
+#    console:
+#      enabled: true
+#  jpa:
+#    database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:mysql://localhost/showmori?characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: dkdusaos-1
+    driver-class-name: com.mysql.jdbc.Driver
+    generate-unique-name: true
+    hikari:
+      schema: showmori
+  devtools:
+    livereload:
+      enabled: true
+  freemarker:
+    cache: false
+  mustache:
+    expose-session-attributes: true
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL5Dialect
+      naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    database: mysql
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  http:
+    multipart:
+      enabled: false
+  mvc:
+    async:
+      request-timeout: 5000
